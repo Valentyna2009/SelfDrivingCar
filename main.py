@@ -32,6 +32,7 @@ def find_lane_lines(img):
     # convert the imgags to grayscale
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
+    #blur the images
     img_gauss = cv2.GaussianBlur(gray, (11,11), 0)
 
     thresh_low = 150
