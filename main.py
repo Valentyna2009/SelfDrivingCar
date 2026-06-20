@@ -23,6 +23,7 @@ def show_images(images, cmap='viridis'):
     
     for i, img in enumerate(images):
         plt.subplot(row, column, i+1) # 2 rows, 3 columns, position of img
+# <<<<<<< HEAD
         plt.imshow(img, cmap=cmap)
         plt.axis('off')
     plt.show()
@@ -75,3 +76,14 @@ def birdview_transform(img):
 birdview_images = [birdview_transform(img) for img in list_img_lines]
 
 show_images(birdview_images, cmap='gray')
+#=======
+        if cmap != 'gray':
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        plt.imshow(img, cmap=cmap)
+        plt.axis('off')
+        plt.show()
+
+
+show_images(roads)
+
+#>>>>>>> 69d042671ba8d53208a1f54e4f00f6b81df497ac
