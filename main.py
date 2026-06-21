@@ -23,7 +23,6 @@ def show_images(images, cmap='viridis'):
     
     for i, img in enumerate(images):
         plt.subplot(row, column, i+1) # 2 rows, 3 columns, position of img
-# <<<<<<< HEAD
         plt.imshow(img, cmap=cmap)
         plt.axis('off')
     plt.show()
@@ -76,14 +75,62 @@ def birdview_transform(img):
 birdview_images = [birdview_transform(img) for img in list_img_lines]
 
 show_images(birdview_images, cmap='gray')
-#=======
-        if cmap != 'gray':
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        plt.imshow(img, cmap=cmap)
-        plt.axis('off')
-        plt.show()
-
-
-show_images(roads)
 
 #>>>>>>> 69d042671ba8d53208a1f54e4f00f6b81df497ac
+
+# Find the left/right points
+
+def find_left_right_points(image, draw = False):
+
+    #taking only widths and heights
+    im_height, im_width = image.shape[:2]
+    if draw:
+        viz_img = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
+        
+    #locate the line in 70% from bottom of the image
+    interested_line_y = int(im_height *0.7)
+
+    #indicate the second line of the road
+    if draw:
+        cv2.line(viz_img, (0, interested_line_y), (im_width, interested_line_y), (0, 0, 255), 2)
+    interested_line = image[interested_line_y, :]
+
+    left_point = -1
+    right_point = -1
+    lane_width = 175
+    center = im_width//2
+
+    #finding the left and right points by traversing outward from the center
+    for x in range(center, 0, -1):
+        if interested_line[x] >0:
+            left_point = x
+            break
+    for x in range(center +1, 0, -1):
+        if interested_line[x] < 0:
+            right_point = x
+            break
+
+    #prediction the point on the right when inly the point on the left is known
+    if left_point != -1 and right_point == -1:
+        right_point = left_point + lane_width
+
+    #prediction the point on the left when inly the point on the right is known
+    if right_point != -1 and left_point == -1:
+        left_point = right_point + lane_width
+
+    #draw two points
+    if draw:
+        if left_point != -1:
+            viz_img = cv2.circle(viz_img, (left_point, interested_line_y), 7, (255, 255, 0), -1)
+        if right_point != -1:
+            viz_img = cv2.circle(viz_img, (right_point, interested_line_y), 7, (255, 255, 0), -1)
+
+        return left_point, right_point, viz_img
+
+viz_images = []
+
+for img in birdview_images:
+    left_point, right_point, viz_img = find_left_right_points(img, draw=True)
+    viz_images.append(viz_img)
+
+show_images(viz_images)
