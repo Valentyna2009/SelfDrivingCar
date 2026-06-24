@@ -134,3 +134,29 @@ for img in birdview_images:
     viz_images.append(viz_img)
 
 show_images(viz_images)
+
+def calculate_control_signal(img):
+    # Calclulate speed and streering angle
+
+    img_lines = find_lane_lines(img)
+    img_birdview = birdview_transform(img_lines)
+    left_point, right_point, viz_img = find_left_right_points(img_birdview, False)
+
+    #show image
+    cv2.imshow('Result', viz_img)
+    cv2.waitKey(1)
+
+    #Calclulate speed and angle
+    #The speed is fixed to 50% of the max speed 
+    throttle = 0.5 #limit
+    steerring_angle = 0
+    im_center = img.shape[1]//2
+
+    if left_point != -1 and right_point != -1:
+        center_point = (right_point + left_point) //2
+        center_diff = im_center - center_point
+
+
+        steerring_angle = -float(center_diff * 0.01)
+
+    return throttle, steerring_angle
